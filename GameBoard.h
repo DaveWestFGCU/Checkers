@@ -5,7 +5,7 @@
 
 /**
  * Class for a gameboard object.
- * Contains a 2d array of piece objects.
+ * Contains a 2d array of GameTile objects and an array of piece objects.
  */
 class GameBoard {
 protected:
@@ -117,6 +117,10 @@ void GameBoard::display() {
 }   // end display()
 
 
+/**
+ * Perform one player's game round
+ * @param player - int specifier of which player
+ */
 void GameBoard::playTurn(int player) {
     system("cls");
     display();
@@ -206,6 +210,15 @@ void GameBoard::getPiece(int player, Location & loc) {
 } // end getPiece()
 
 
+/**
+ * Prompts player for where they want to move their piece with input validation.
+ * Determines whether move is a movement or attack.
+ * If attack, removes opponent's captured piece.
+ * @param player - int: Specifier for which player
+ * @param loc - Location of piece to move
+ * @param isAttack - & bool: true if move fits attack criteria and captures opponent's piece
+ * @return New location to move player's piece
+ */
 Location GameBoard::getMove(int player, Location loc, bool &isAttack) {
     bool validInput = false;
     bool maybeValid = false;
@@ -245,7 +258,11 @@ Location GameBoard::getMove(int player, Location loc, bool &isAttack) {
     return newLoc;
 }   // end getMove()
 
-
+/**
+ * Moves player's piece to new location.
+ * @param prevLoc Location: Start point for player's move
+ * @param newLoc Location: End point for player's move
+ */
 void GameBoard::movePiece(Location prevLoc, Location newLoc) {
     // update piece
     tileArray[prevLoc.getX()][prevLoc.getY()] -> getPiece() -> move(newLoc);
