@@ -1,6 +1,7 @@
 #ifndef CHECKERS_PIECE_H
 #define CHECKERS_PIECE_H
 
+#include <iostream>
 #include <string>
 #include "Location.h"
 

@@ -2,6 +2,7 @@
 #define CHECKERS_GAMETILE_H
 
 #include "Man.h"
+#include "King.h"
 
 /**
  * A tile on the board. Can hold a Piece object.

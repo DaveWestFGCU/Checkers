@@ -1,6 +1,7 @@
 #ifndef CHECKERS_LOCATION_H
 #define CHECKERS_LOCATION_H
 
+#include <iostream>
 #include <cmath>
 
 class Location {
@@ -24,7 +25,6 @@ public:
     void setY(int newY) { yCoord = newY; }
 
     // Operator Overloading
-    Location operator=(Location locTwo);
     Location operator+(Location locTwo);
     Location operator-(Location locTwo);
     Location operator/(int divisor);
@@ -32,20 +32,10 @@ public:
 
 
 /**
- *
- * @param locTwo
- * @return
- */
-Location Location::operator=(Location locTwo) {
-    xCoord = locTwo.xCoord;
-    yCoord = locTwo.yCoord;
-}
-
-
-/**
- *
- * @param locTwo
- * @return
+ * Addition operator. Adds the first Location and second Location's x and y coordinates.
+ * Used in the midpoint formula (i.e.: (loc + locTwo) / 2 ).
+ * @param locTwo - The location to become the second addend
+ * @return Location - the sum of two locations
  */
 Location Location::operator+(Location locTwo) {
     int xSum = xCoord + locTwo.xCoord;
@@ -57,8 +47,7 @@ Location Location::operator+(Location locTwo) {
 
 
 /**
- * Returns the difference between this location (minuend) and
- * a second location (subtrahend).
+ * Subtraction operator. Subtracts this location (minuend) from a second location (subtrahend).
  * @param locTwo : Second location (subtrahend)
  * @return A Location of the distance between locations.
  */
@@ -72,7 +61,7 @@ Location Location::operator-(Location locTwo) {
 
 /**
  * Divides a location by an integer.
- * Used with - operator to find midpoints (i.e.: (locA + locB) / 2 ).
+ * Used in midpoint formula (i.e.: (locA + locB) / 2 ).
  * @param divisor int: Should be a common factor between location xCoord and yCoord.
  * @return A Location with xCoord / divisor and yCoord / divisor.
  */
@@ -89,7 +78,7 @@ Location Location::operator/(int divisor) {
 
     if (fabs(xFrac) > 10e-7 || fabs(yFrac) > 10e-7) {
         std::cout << "!! WARNING !!\n"
-                     "Location division did not yield an integer x and y coordinate! "
+                     "Location division did not yield an integer x or y coordinate! "
                      "The result was truncated!" << std::endl;
     }
 
