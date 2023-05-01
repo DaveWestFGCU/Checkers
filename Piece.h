@@ -12,7 +12,7 @@ protected:
     int player;
     std::string name;
     std::string symbol;
-    Location loc;
+    Location myLocation;
     bool alive = true;
 
 public:
@@ -21,15 +21,16 @@ public:
     Piece (int player);
     ~Piece () { std::cout << "Piece destructor called" << std::endl;   }
 
-    // One line functions
+    // Single line functions
     std::string getSymbol() { return symbol; }
     int getPlayer() { return player; }
     std::string getName() { return name; }
-    void updatePosition(Location newLocation) { loc = newLocation; }
+    void updatePosition(Location newLocation) { myLocation = newLocation; }
+    Location getLocation() { return myLocation; }
     bool inPlay() { return alive; }
     void capture() { alive = false; }
 
-    // Complex functions
+    // 2+ line functions
     void move(Location newLoc);
     void release(Location newLoc);
 
@@ -46,19 +47,18 @@ Piece::Piece (int player) {
 
 
 void Piece::move(Location newLoc) {
-    // Player made a basic move. No attacking.
-    if ( validMove(newLoc) ) {
-        loc.setX(newLoc.getX());
-        loc.setY(newLoc.getY());
-
-        return;
+    if ( validMove(newLoc) || validAttack(newLoc)) {
+        myLocation.setX(newLoc.getX());
+        myLocation.setY(newLoc.getY());
     }
+    else
+        std::cout << "Piece Move function failed!" << std::endl;
 }
 
 
 void Piece::release(Location newLoc) {
     alive = true;
-    loc = newLoc;
+    myLocation = newLoc;
 }
 
 

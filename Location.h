@@ -24,10 +24,22 @@ public:
     void setY(int newY) { yCoord = newY; }
 
     // Operator Overloading
+    Location operator=(Location locTwo);
     Location operator+(Location locTwo);
     Location operator-(Location locTwo);
     Location operator/(int divisor);
 };
+
+
+/**
+ *
+ * @param locTwo
+ * @return
+ */
+Location Location::operator=(Location locTwo) {
+    xCoord = locTwo.xCoord;
+    yCoord = locTwo.yCoord;
+}
 
 
 /**

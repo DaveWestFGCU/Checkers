@@ -31,13 +31,13 @@ Man::Man (int player) {
 bool Man::validMove(Location newLoc) {
     // Basic movement
         // Check if move is one space to left or right
-    if ( newLoc.getX() == loc.getX() + 1 || newLoc.getX() == loc.getX() - 1 ) {
+    if (newLoc.getX() == myLocation.getX() + 1 || newLoc.getX() == myLocation.getX() - 1 ) {
 
         // Check if move is "forward", which depends on player
-        if (player == 0 && newLoc.getY() == loc.getY() + 1)
+        if (player == 0 && newLoc.getY() == myLocation.getY() + 1)
             return true;
 
-        if (player == 1 && newLoc.getY() == loc.getY() - 1)
+        if (player == 1 && newLoc.getY() == myLocation.getY() - 1)
             return true;
     }
 
@@ -52,12 +52,12 @@ bool Man::validMove(Location newLoc) {
 bool Man::validAttack(Location newLoc) {
     // Jump movement
     // Check if move is two spaces to left or right
-    if ( newLoc.getX() == loc.getX() + 2 || newLoc.getX() == loc.getX() - 2 ) {
+    if (newLoc.getX() == myLocation.getX() + 2 || newLoc.getX() == myLocation.getX() - 2 ) {
         // Check if move is "forward", which depends on player
-        if (player == 0 && newLoc.getY() == loc.getY() + 2)
+        if (player == 0 && newLoc.getY() == myLocation.getY() + 2)
             return true;
 
-        if (player == 1 && newLoc.getY() == loc.getY() - 2)
+        if (player == 1 && newLoc.getY() == myLocation.getY() - 2)
             return true;
     }
     return false;

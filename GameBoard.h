@@ -22,8 +22,8 @@ public:
     void display();
     void playTurn(int player);
     Location promptAndValidateLocation(std::string prompt);
-    void getPiece(int player, Location & loc);
-    Location getMove(int player, Location loc, bool &isAttack);
+    Location getPieceLocation(int player);
+    Location getMove(int player, Location loc, bool & inAttack);
     void movePiece(Location prevLoc, Location newLoc);
 };
 
@@ -122,20 +122,52 @@ void GameBoard::display() {
  * @param player - int specifier of which player
  */
 void GameBoard::playTurn(int player) {
-    system("cls");
-    display();
 
-    bool isAttack = false;
+    bool inTurn = true;
+    bool inAttack = false;
+    Location pieceLoc, newLoc;
 
-    Location loc, newLoc;
-    getPiece(player, loc);
-    newLoc = getMove(player, loc, isAttack);
-    movePiece(loc, newLoc);
-    std::cout << "You jumped your opponent's piece!" << std::endl;
-//    while (isAttack) {
-//        // continue jumping
-//    }
-}
+    while ( inTurn ) {
+        pieceLoc = getPieceLocation(player);
+
+        try {
+            newLoc = getMove(player, pieceLoc, inAttack);
+            movePiece(pieceLoc, newLoc);
+
+            if ( !inAttack )
+                return;     // Turn is over
+        }
+        catch (int error) {
+            if (error == 1) {       // Player changed mind about piece to move.
+                continue;           // Restart turn.
+            }
+            if (error == 2) {
+                std::cout << "Unable to end turn. Please move a piece." << std::endl;
+            }
+        }
+
+        while (inAttack) {
+            std::cout << "Player " << player
+                      << " - You jumped a piece. Move again." << std::endl;
+
+            try {
+                pieceLoc = newLoc;
+                newLoc = getMove(player, pieceLoc, inAttack);
+                movePiece(pieceLoc, newLoc);
+            }
+            catch (int error) {
+                if (error == 1) {
+                    std::cout << "Unable to go back to piece selection." << std::endl;
+                }
+                if (error == 2) { // Player wants to end turn
+                    system("cls");
+                    display();
+                    return;
+                }
+            }
+        }
+    }
+}   // end PlayTurn()
 
 
 /**
@@ -153,6 +185,18 @@ Location GameBoard::promptAndValidateLocation(std::string prompt) {
         std::cout << prompt;
         std::string locationInputString;
         std::cin >> locationInputString;
+
+        if (locationInputString == "back" ||
+            locationInputString == "Back" ||
+            locationInputString == "BACK")  {
+            throw 1;
+        }
+
+        if (locationInputString == "end" ||
+            locationInputString == "End" ||
+            locationInputString == "END") {
+            throw 2;
+        }
 
         loc.setX( (int)locationInputString[0] - 65 );
         loc.setY( (int)locationInputString[1] - 49 );
@@ -188,26 +232,30 @@ Location GameBoard::promptAndValidateLocation(std::string prompt) {
  * Checks if a valid piece is in the location provided
  * @return
  */
-void GameBoard::getPiece(int player, Location & loc) {
+Location GameBoard::getPieceLocation(int player) {
     bool validInput = false;
+    Location loc;
 
     while ( !validInput ) {
         std::string piecePrompt = "Player " + std::to_string(player)
                                   +" - Choose your piece: ";
+
         loc = promptAndValidateLocation(piecePrompt);
 
-        if (tileArray[loc.getX()][loc.getY()]->hasPiece()) {
-            if (tileArray[loc.getX()][loc.getY()]->getPiece()->getPlayer() == player) {
+        if (tileArray[loc.getX()][loc.getY()] -> hasPiece()) {
+            if (tileArray[loc.getX()][loc.getY()] -> getPiece() -> getPlayer() == player) {
                 validInput = true;
             } else
                 std::cout << "This "
-                          << tileArray[loc.getX()][loc.getY()]->getPiece()->getName()
+                          << tileArray[loc.getX()][loc.getY()] -> getPiece() -> getName()
                           << " is not yours! Please try again." << std::endl;
         } else
             std::cout << "No piece was found at this spot. Please try again."
                       << std::endl;
     }
-} // end getPiece()
+
+    return loc;
+} // end getPieceLocation()
 
 
 /**
@@ -216,22 +264,27 @@ void GameBoard::getPiece(int player, Location & loc) {
  * If attack, removes opponent's captured piece.
  * @param player - int: Specifier for which player
  * @param loc - Location of piece to move
- * @param isAttack - & bool: true if move fits attack criteria and captures opponent's piece
+ * @param inAttack - & bool: true if move fits attack criteria and captures opponent's piece
  * @return New location to move player's piece
  */
-Location GameBoard::getMove(int player, Location loc, bool &isAttack) {
+Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
     bool validInput = false;
-    bool maybeValid = false;
     Location newLoc;
     while ( !validInput ) {
         std::string movePrompt = "Player " + std::to_string(player)
                                  + " - Where would you like to move your "
                                  + tileArray[loc.getX()][loc.getY()]->getPiece()->getName()
-                                 + "? ";
+                                 + "?\n";
+        if ( !inAttack )
+            movePrompt += "(or type 'back' to change your piece): ";
+        else
+            movePrompt += "(or type 'end' to end your turn): ";
+
         newLoc = promptAndValidateLocation(movePrompt);
 
         // Check if it's a valid move
-        if ( tileArray[loc.getX()][loc.getY()] -> getPiece() -> validMove(newLoc) ) {
+        bool moveIsValid = tileArray[loc.getX()][loc.getY()] -> getPiece() -> validMove(newLoc);
+        if ( !inAttack && moveIsValid ) {
             if (tileArray[newLoc.getX()][newLoc.getY()] -> hasPiece() == false ) {
                 validInput = true;
             }
@@ -241,12 +294,12 @@ Location GameBoard::getMove(int player, Location loc, bool &isAttack) {
             }
         }
         else {  // Not valid move, but maybe valid attack
-            if ( tileArray[loc.getX()][loc.getY()] -> getPiece() -> validAttack(newLoc)) {
+            if ( tileArray[loc.getX()][loc.getY()] -> getPiece() -> validAttack(newLoc) ) {
                 // Use midpoint formula to check for piece to jump.
                 Location midLoc = ((newLoc + loc) / 2);
                 if (tileArray[midLoc.getX()][midLoc.getY()] -> hasPiece()) {
                     validInput = true;
-                    isAttack = true;
+                    inAttack = true;
                     tileArray[midLoc.getX()][midLoc.getY()] -> getPiece() -> capture();
                     tileArray[midLoc.getX()][midLoc.getY()] -> removePiece();
                 }
@@ -264,7 +317,7 @@ Location GameBoard::getMove(int player, Location loc, bool &isAttack) {
  * @param newLoc Location: End point for player's move
  */
 void GameBoard::movePiece(Location prevLoc, Location newLoc) {
-    // update piece
+    // update piece location
     tileArray[prevLoc.getX()][prevLoc.getY()] -> getPiece() -> move(newLoc);
 
     // update board tiles
@@ -272,6 +325,8 @@ void GameBoard::movePiece(Location prevLoc, Location newLoc) {
     tileArray[newLoc.getX()][newLoc.getY()] = tileArray[prevLoc.getX()][prevLoc.getY()];
     tileArray[prevLoc.getX()][prevLoc.getY()] = new GameTile();
 
+    system("cls");
+    display();
 }
 
 #endif //CHECKERS_GAMEBOARD_H
