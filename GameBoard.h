@@ -25,6 +25,8 @@ public:
     Location getPieceLocation(int player);
     Location getMove(int player, Location loc, bool & inAttack);
     void movePiece(Location prevLoc, Location newLoc);
+    bool isLastRow(Location newLoc);
+    void kingMe(Location newLoc);
 };
 
 
@@ -122,51 +124,49 @@ void GameBoard::display() {
  * @param player - int specifier of which player
  */
 void GameBoard::playTurn(int player) {
-
     bool inTurn = true;
     bool inAttack = false;
     Location pieceLoc, newLoc;
 
     while ( inTurn ) {
-        pieceLoc = getPieceLocation(player);
+        // Force player to move same piece if making second move after jumping
+        if ( !inAttack )
+            pieceLoc = getPieceLocation(player);
+        else {
+            std::cout << "Player " << player
+                      << " - You jumped a piece. Move again." << std::endl;
+            pieceLoc = newLoc;
+        }
 
-        try {
+        try {   // Make a move
             newLoc = getMove(player, pieceLoc, inAttack);
             movePiece(pieceLoc, newLoc);
 
-            if ( !inAttack )
+            // Check if piece can be upgraded
+            if ( isLastRow( newLoc ) ) {
+                kingMe( newLoc );
+            }
+
+            if (!inAttack)
                 return;     // Turn is over
         }
-        catch (int error) {
-            if (error == 1) {       // Player changed mind about piece to move.
+        catch ( std::string error ) {
+            if ( error == "back" && !inAttack ) {       // Player changed mind about piece to move.
                 continue;           // Restart turn.
             }
-            if (error == 2) {
+            if ( error == "end" && !inAttack ) {        // Attempts to end turn before first move
                 std::cout << "Unable to end turn. Please move a piece." << std::endl;
             }
-        }
-
-        while (inAttack) {
-            std::cout << "Player " << player
-                      << " - You jumped a piece. Move again." << std::endl;
-
-            try {
-                pieceLoc = newLoc;
-                newLoc = getMove(player, pieceLoc, inAttack);
-                movePiece(pieceLoc, newLoc);
+            if ( error == "back" && inAttack ) {         // Attempts to change piece after jumping
+                std::cout << "Unable to go back to piece selection." << std::endl;
             }
-            catch (int error) {
-                if (error == 1) {
-                    std::cout << "Unable to go back to piece selection." << std::endl;
-                }
-                if (error == 2) { // Player wants to end turn
-                    system("cls");
-                    display();
-                    return;
-                }
+            if ( error == "end" && inAttack ) {         // Wants to end turn after jumping
+                system("cls");
+                display();
+                return;
             }
-        }
-    }
+        } // end catch
+    }   // end while ( inTurn )
 }   // end PlayTurn()
 
 
@@ -189,13 +189,15 @@ Location GameBoard::promptAndValidateLocation(std::string prompt) {
         if (locationInputString == "back" ||
             locationInputString == "Back" ||
             locationInputString == "BACK")  {
-            throw 1;
+            std::string throwString = "back";
+            throw throwString;
         }
 
         if (locationInputString == "end" ||
             locationInputString == "End" ||
             locationInputString == "END") {
-            throw 2;
+            std::string throwString = "end";
+            throw throwString;
         }
 
         loc.setX( (int)locationInputString[0] - 65 );
@@ -280,10 +282,12 @@ Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
         else
             movePrompt += "(or type 'end' to end your turn): ";
 
+        // Loop until a position on the board is given
         newLoc = promptAndValidateLocation(movePrompt);
 
         // Check if it's a valid move
-        bool moveIsValid = tileArray[loc.getX()][loc.getY()] -> getPiece() -> validMove(newLoc);
+        bool moveIsValid = tileArray[loc.getX()][loc.getY()]->getPiece()->validMove(
+                newLoc);
         if ( !inAttack && moveIsValid ) {
             if (tileArray[newLoc.getX()][newLoc.getY()] -> hasPiece() == false ) {
                 validInput = true;
@@ -294,7 +298,7 @@ Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
             }
         }
         else {  // Not valid move, but maybe valid attack
-            if ( tileArray[loc.getX()][loc.getY()] -> getPiece() -> validAttack(newLoc) ) {
+            if (tileArray[loc.getX()][loc.getY()] -> getPiece() -> validAttack(newLoc) ) {
                 // Use midpoint formula to check for piece to jump.
                 Location midLoc = ((newLoc + loc) / 2);
                 if (tileArray[midLoc.getX()][midLoc.getY()] -> hasPiece()) {
@@ -305,7 +309,12 @@ Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
                 }
             }
             else
-                std::cout << "This move is invalid. Please try again." << std::endl;
+                std::cout << "This move is invalid. Please try again." << "\n" <<
+                "My loc: (" << tileArray[newLoc.getX()][newLoc.getY()] ->getPiece()->getLocation().getX()
+                            << ", " << tileArray[newLoc.getX()][newLoc.getY()] ->getPiece()->getLocation().getX() << ") \n" <<
+                "My tile loc: (" << loc.getX() << ", " << loc.getY() << ") \n" <<
+                "New loc: (" << newLoc.getX() << ", "<< newLoc.getY() << ") \n" <<
+                "Has piece? " << tileArray[newLoc.getX()][newLoc.getY()]->hasPiece() << std::endl;
         }
     }
     return newLoc;
@@ -327,6 +336,20 @@ void GameBoard::movePiece(Location prevLoc, Location newLoc) {
 
     system("cls");
     display();
+}
+
+
+bool GameBoard::isLastRow(Location newLoc) {
+    return newLoc.getY() == 0 || newLoc.getY() == yDimension-1;
+}
+
+
+void GameBoard::kingMe(Location newLoc) {
+    tileArray[newLoc.getX()][newLoc.getY()] -> getPiece() -> kingMe();
+    system("cls");
+    display();
+
+    std::cout << "Your man is now a king!" << std::endl;
 }
 
 #endif //CHECKERS_GAMEBOARD_H
