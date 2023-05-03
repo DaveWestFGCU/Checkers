@@ -47,7 +47,15 @@ std::string GameTile::display() {
         return gamePiece->getSymbol();
     }
 
-    return "___";     // empty tile space
+    char whiteSpace = 178;
+    std::string whiteTile(1,whiteSpace);
+    whiteTile += whiteSpace;
+    whiteTile += whiteSpace;
+
+    if ( (myLocation.getX() + myLocation.getY()) % 2 )
+        return whiteTile;
+
+    return "   ";     // empty tile space
 }
 
 

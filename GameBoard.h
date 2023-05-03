@@ -114,17 +114,15 @@ void GameBoard::newBoard() {
 void GameBoard::display() {
     // Highest row at top
     for (int y = yDimension-1; y >= 0; --y) {
-        std::cout << y+1 << " |";
+        std::cout << y+1 << " ";
         // Lowest row on left
         for (int x = 0; x < xDimension; ++x) {
-            std::cout << "";
             std::cout << tileArray[x][y]->display();
-            std::cout << "|";
         }
         std::cout << std::endl;
         Sleep(5);
     }
-    std::cout << "    A   B   C   D   E   F   G   H" << std::endl;
+    std::cout << "   A  B  C  D  E  F  G  H" << std::endl;
 }   // end display()
 
 
@@ -297,39 +295,43 @@ Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
         // Check if it's a valid move
         bool moveIsValid = tileArray[loc.getX()][loc.getY()]-> getPiece()-> validMove(newLoc);
         if ( !inAttack && moveIsValid ) {
-            if (tileArray[newLoc.getX()][newLoc.getY()] -> hasPiece() == false ) {
-                validInput = true;
+            if ( tileArray[newLoc.getX()][newLoc.getY()] -> hasPiece() ) {
+                std::cout << "There is a piece at this location. Please try again."
+                          << std::endl;
             }
             else {
-                std::cout << "You already have a piece at this location. Please try again."
-                          << std::endl;
+                validInput = true;
             }
         }
         else {  // Not valid move, but maybe valid attack
             if (tileArray[loc.getX()][loc.getY()] -> getPiece() -> validAttack(newLoc) ) {
-                // Use midpoint formula to check for piece to jump.
-                Location midLoc = ((newLoc + loc) / 2);
-                if (tileArray[midLoc.getX()][midLoc.getY()] -> hasPiece()) {
-                    validInput = true;
-                    inAttack = true;
-                    tileArray[midLoc.getX()][midLoc.getY()] -> getPiece() -> capture();
-                    tileArray[midLoc.getX()][midLoc.getY()] -> removePiece();
+                if ( tileArray[newLoc.getX()][newLoc.getY()] -> hasPiece() ) {
+                    std::cout << "There is a piece at this location. Please try again."
+                              << std::endl;
                 }
-                else
-                    std::cout << "This move is invalid. Please try again." << "\n"
-                            << "My tile loc: (" << loc.getX() << ", " << loc.getY() << ") \n"
-                            << "My loc: (" << tileArray[loc.getX()][loc.getY()]-> getPiece()-> getLocation().getX()
-                            << ", " << tileArray[loc.getX()][loc.getY()] ->getPiece()->getLocation().getY() << ") \n"
-                            << "New loc: (" << newLoc.getX() << ", "<< newLoc.getY() << ") \n"
-                            << "Has piece? " << tileArray[newLoc.getX()][newLoc.getY()]->hasPiece() << std::endl;
+                else {
+                    // Use midpoint formula to check for piece to jump.
+                    Location midLoc = ((newLoc + loc) / 2);
+                    GameTile * tileToJump = tileArray[midLoc.getX()][midLoc.getY()];
+                    if ( tileToJump-> hasPiece()) {
+                        if ( tileToJump-> getPiece() -> getPlayer() == player ) {
+                            std::cout << "You cannot capture your own piece. Please try again."
+                                      << std::endl;
+                        }
+                        else {
+                            validInput = true;
+                            inAttack = true;
+                            tileToJump->getPiece()->capture();
+                            tileToJump->removePiece();
+                        }
+                    } else
+                        std::cout << "This move is invalid. Please try again."
+                                  << std::endl;
+                }
             }
             else
-                std::cout << "This move is invalid. Please try again." << "\n"
-                        << "My tile loc: (" << loc.getX() << ", " << loc.getY() << ") \n"
-                        << "My loc: (" << tileArray[loc.getX()][loc.getY()]-> getPiece()-> getLocation().getX()
-                        << ", " << tileArray[loc.getX()][loc.getY()]-> getPiece()-> getLocation().getY() << ") \n"
-                        << "New loc: (" << newLoc.getX() << ", "<< newLoc.getY() << ") \n"
-                        << "Has piece? " << tileArray[newLoc.getX()][newLoc.getY()]-> hasPiece() << std::endl;
+                std::cout << "This move is invalid. Please try again."
+                          << std::endl;
         }
     }
     return newLoc;

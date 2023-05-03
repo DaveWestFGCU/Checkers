@@ -2,12 +2,12 @@
 #include "GameBoard.h"
 
 // ---------------| Constants |-------------------
-const int xSize = 8;    // Width of the board
-const int ySize = 8;    // Height of the board
+const int X_SIZE = 8;    // Width of the board
+const int Y_SIZE = 8;    // Height of the board
 
 
 int main() {
-    GameBoard checkerBoard(xSize, ySize);
+    GameBoard checkerBoard(X_SIZE, Y_SIZE);
 
     // Set initial game state
     checkerBoard.buildPieces();
