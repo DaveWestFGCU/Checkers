@@ -14,7 +14,7 @@ int main() {
     checkerBoard.newBoard();
     bool gameOver = false;
 
-    system("cls");
+   // system("cls");
     checkerBoard.display();
 
     // Play game

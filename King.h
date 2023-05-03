@@ -23,9 +23,11 @@ public:
  */
 bool King::validKingMove(Location newLoc) {
     // Check if move is one space to left or right
-    if (newLoc.getX() == myLocation.getX() + 1 || newLoc.getX() == myLocation.getX() - 1 )
+    if ( newLoc.getX() == myLocation.getX() + 1 ||
+         newLoc.getX() == myLocation.getX() - 1 )
         // Check if move is one space forward or back
-        if ( newLoc.getX() == myLocation.getY() + 1 || newLoc.getY() == myLocation.getY() - 1 )
+        if ( newLoc.getY() == myLocation.getY() + 1 ||
+             newLoc.getY() == myLocation.getY() - 1 )
             return true;
 
     return false;
@@ -39,9 +41,11 @@ bool King::validKingMove(Location newLoc) {
 bool King::validKingAttack(Location newLoc) {
     // Jump movement
     // Check if move is two spaces to left or right
-    if ( newLoc.getX() == myLocation.getX() + 2 || newLoc.getX() == myLocation.getX() - 2 )
+    if ( newLoc.getX() == myLocation.getX() + 2 ||
+         newLoc.getX() == myLocation.getX() - 2 )
         // Check if move is two spaces forward or back
-        if ( newLoc.getX() == myLocation.getY() + 2 || newLoc.getY() == myLocation.getY() - 2 )
+        if ( newLoc.getY() == myLocation.getY() + 2 ||
+             newLoc.getY() == myLocation.getY() - 2 )
             return true;
 
     return false;

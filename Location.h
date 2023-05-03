@@ -1,5 +1,5 @@
-#ifndef CHECKERS_LOCATION_H
-#define CHECKERS_LOCATION_H
+#ifndef LOCATION_H
+#define LOCATION_H
 
 #include <iostream>
 #include <cmath>
@@ -86,4 +86,4 @@ Location Location::operator/(int divisor) {
 }
 
 
-#endif //CHECKERS_LOCATION_H
+#endif //LOCATION_H

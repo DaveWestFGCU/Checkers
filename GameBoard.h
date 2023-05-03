@@ -1,6 +1,7 @@
-#ifndef CHECKERS_GAMEBOARD_H
-#define CHECKERS_GAMEBOARD_H
+#ifndef GAMEBOARD_H
+#define GAMEBOARD_H
 
+#include <windows.h>
 #include "GameTile.h"
 
 /**
@@ -45,10 +46,10 @@ GameBoard::GameBoard(int xDimension, int yDimension) {
         tileArray[x] = new GameTile *[yDimension];
 
         for (int y = 0; y < yDimension; ++y) {
-            tileArray[x][y] = new GameTile();
+            tileArray[x][y] = new GameTile(x,y);
         }
     }
-}   // end GameBoard(xDimension, yDimension) constructor
+}   // end GameBoard(x, y) constructor
 
 
 /**
@@ -71,6 +72,7 @@ void GameBoard::newBoard() {
     // Set up close side of board (player 0)
     int thisPiece { 0 };
 
+    // Checkers: Pieces on every other space.
     for (int y = 0; y < 3; ++y) {
         for (int x = 0; x < xDimension; ++x) {
             if ( !((x + y) % 2)) {
@@ -81,11 +83,13 @@ void GameBoard::newBoard() {
                 Location newPos(x,y);
                 pieceArray[thisPiece] -> updatePosition(newPos);
                 ++thisPiece;
+                Sleep(5);
             }
         }
     }
 
     // Set up far side of board (player 1)
+    // Checkers: Pieces on every other space.
     for (int y = yDimension-3; y < yDimension; ++y) {
         for (int x = 0; x < xDimension; ++x) {
             if (!((x + y) % 2)) {
@@ -286,8 +290,7 @@ Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
         newLoc = promptAndValidateLocation(movePrompt);
 
         // Check if it's a valid move
-        bool moveIsValid = tileArray[loc.getX()][loc.getY()]->getPiece()->validMove(
-                newLoc);
+        bool moveIsValid = tileArray[loc.getX()][loc.getY()]-> getPiece()-> validMove(newLoc);
         if ( !inAttack && moveIsValid ) {
             if (tileArray[newLoc.getX()][newLoc.getY()] -> hasPiece() == false ) {
                 validInput = true;
@@ -307,14 +310,21 @@ Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
                     tileArray[midLoc.getX()][midLoc.getY()] -> getPiece() -> capture();
                     tileArray[midLoc.getX()][midLoc.getY()] -> removePiece();
                 }
+                else
+                    std::cout << "This move is invalid. Please try again." << "\n"
+                            << "My tile loc: (" << loc.getX() << ", " << loc.getY() << ") \n"
+                            << "My loc: (" << tileArray[loc.getX()][loc.getY()]-> getPiece()-> getLocation().getX()
+                            << ", " << tileArray[loc.getX()][loc.getY()] ->getPiece()->getLocation().getY() << ") \n"
+                            << "New loc: (" << newLoc.getX() << ", "<< newLoc.getY() << ") \n"
+                            << "Has piece? " << tileArray[newLoc.getX()][newLoc.getY()]->hasPiece() << std::endl;
             }
             else
-                std::cout << "This move is invalid. Please try again." << "\n" <<
-                "My loc: (" << tileArray[newLoc.getX()][newLoc.getY()] ->getPiece()->getLocation().getX()
-                            << ", " << tileArray[newLoc.getX()][newLoc.getY()] ->getPiece()->getLocation().getX() << ") \n" <<
-                "My tile loc: (" << loc.getX() << ", " << loc.getY() << ") \n" <<
-                "New loc: (" << newLoc.getX() << ", "<< newLoc.getY() << ") \n" <<
-                "Has piece? " << tileArray[newLoc.getX()][newLoc.getY()]->hasPiece() << std::endl;
+                std::cout << "This move is invalid. Please try again." << "\n"
+                        << "My tile loc: (" << loc.getX() << ", " << loc.getY() << ") \n"
+                        << "My loc: (" << tileArray[loc.getX()][loc.getY()]-> getPiece()-> getLocation().getX()
+                        << ", " << tileArray[loc.getX()][loc.getY()]-> getPiece()-> getLocation().getY() << ") \n"
+                        << "New loc: (" << newLoc.getX() << ", "<< newLoc.getY() << ") \n"
+                        << "Has piece? " << tileArray[newLoc.getX()][newLoc.getY()]-> hasPiece() << std::endl;
         }
     }
     return newLoc;
@@ -352,4 +362,4 @@ void GameBoard::kingMe(Location newLoc) {
     std::cout << "Your man is now a king!" << std::endl;
 }
 
-#endif //CHECKERS_GAMEBOARD_H
+#endif //GAMEBOARD_H

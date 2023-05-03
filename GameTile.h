@@ -1,6 +1,7 @@
-#ifndef CHECKERS_GAMETILE_H
-#define CHECKERS_GAMETILE_H
+#ifndef GAMETILE_H
+#define GAMETILE_H
 
+#include "Location.h"
 #include "Man.h"
 #include "King.h"
 
@@ -11,15 +12,23 @@ class GameTile {
 protected:
     Man * gamePiece = nullptr;
     bool tileFilled { false };
+    Location myLocation;
 
 public:
     GameTile() = default;
+    GameTile(int x, int y);
     void setPiece(Man * gamePiece);
     Man * getPiece() { return gamePiece; }
     bool hasPiece();
     std::string display();
     void removePiece();
 };
+
+
+GameTile::GameTile(int x, int y) {
+    myLocation.setX(x);
+    myLocation.setY(y);
+}
 
 
 void GameTile::setPiece(Man * gamePiece) {
@@ -47,4 +56,4 @@ void GameTile::removePiece() {
     tileFilled = false;
 }
 
-#endif //CHECKERS_GAMETILE_H
+#endif //GAMETILE_H

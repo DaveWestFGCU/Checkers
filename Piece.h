@@ -1,9 +1,10 @@
-#ifndef CHECKERS_PIECE_H
-#define CHECKERS_PIECE_H
+#ifndef PIECE_H
+#define PIECE_H
 
 #include <iostream>
 #include <string>
 #include "Location.h"
+#include "GameTile.h"
 
 /**
  * Class for a game piece object on a 2d board.
@@ -13,7 +14,7 @@ protected:
     int player;
     std::string name;
     std::string symbol;
-    Location myLocation;
+    Location myLocation;    // TODO : Change location to pointer to tile's location
     bool alive = true;
 
 public:
@@ -26,7 +27,11 @@ public:
     std::string getSymbol() { return symbol; }
     int getPlayer() { return player; }
     std::string getName() { return name; }
-    void updatePosition(Location newLocation) { myLocation = newLocation; }
+    void updatePosition(Location newLocation) {
+        myLocation.setX(newLocation.getX());
+        myLocation.setY(newLocation.getY());
+        std::cout << "My location is (" << myLocation.getX() << ", " << myLocation.getY() << ")\n";
+    }
     Location getLocation() { return myLocation; }
     bool inPlay() { return alive; }
     void capture() { alive = false; }
@@ -63,4 +68,4 @@ void Piece::release(Location newLoc) {
 }
 
 
-#endif //CHECKERS_PIECE_H
+#endif //PIECE_H
