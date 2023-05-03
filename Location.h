@@ -28,6 +28,7 @@ public:
     Location operator+(Location locTwo);
     Location operator-(Location locTwo);
     Location operator/(int divisor);
+    Location operator=(Location locTwo);
 };
 
 
@@ -76,6 +77,7 @@ Location Location::operator/(int divisor) {
     double xFrac = std::modf(divX, &discardIntegral);
     double yFrac = std::modf(divY, &discardIntegral);
 
+    // Make sure the fraction isn't due to double precision margin of error
     if (fabs(xFrac) > 10e-7 || fabs(yFrac) > 10e-7) {
         std::cout << "!! WARNING !!\n"
                      "Location division did not yield an integer x or y coordinate! "
@@ -85,5 +87,18 @@ Location Location::operator/(int divisor) {
     return divLoc;
 }
 
+
+/**
+ * Equality operator. Copies the x and y from the right of the operator to this
+ * Location's xCoord and yCoord.
+ * @param locTwo - Location to copy from.
+ * @return This location.
+ */
+Location Location::operator=(Location locTwo) {
+        xCoord = locTwo.getX();
+        yCoord = locTwo.getY();
+
+    return *this;
+}
 
 #endif //LOCATION_H

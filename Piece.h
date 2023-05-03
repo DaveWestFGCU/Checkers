@@ -27,11 +27,7 @@ public:
     std::string getSymbol() { return symbol; }
     int getPlayer() { return player; }
     std::string getName() { return name; }
-    void updatePosition(Location newLocation) {
-        myLocation.setX(newLocation.getX());
-        myLocation.setY(newLocation.getY());
-        std::cout << "My location is (" << myLocation.getX() << ", " << myLocation.getY() << ")\n";
-    }
+    void updatePosition(Location newLocation) { myLocation = newLocation; }
     Location getLocation() { return myLocation; }
     bool inPlay() { return alive; }
     void capture() { alive = false; }

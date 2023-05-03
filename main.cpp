@@ -13,16 +13,24 @@ int main() {
     checkerBoard.buildPieces();
     checkerBoard.newBoard();
     bool gameOver = false;
+    int round { 0 };
+    int player, opponent;
 
-   // system("cls");
+    system("cls");
     checkerBoard.display();
 
     // Play game
     while (!gameOver) {
-            checkerBoard.playTurn(0);
-            checkerBoard.playTurn(1);
+        ++round;
+        // Player 0 goes first
+        player = (round - 1) % 2;
+        checkerBoard.playTurn( player );
+
+        opponent = (player + 1) % 2;
+        gameOver = checkerBoard.isGameOver( opponent );
     }
 
+    std::cout << "Player " << player << " wins!";
 
     return 0;
 }

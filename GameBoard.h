@@ -4,6 +4,8 @@
 #include <windows.h>
 #include "GameTile.h"
 
+const int PIECES_PER_PLAYER = 12;
+
 /**
  * Class for a gameboard object.
  * Contains a 2d array of GameTile objects and an array of piece objects.
@@ -28,6 +30,7 @@ public:
     void movePiece(Location prevLoc, Location newLoc);
     bool isLastRow(Location newLoc);
     void kingMe(Location newLoc);
+    bool isGameOver(int opponent);
 };
 
 
@@ -57,8 +60,8 @@ GameBoard::GameBoard(int xDimension, int yDimension) {
  */
 void GameBoard::buildPieces() {
     for (int player = 0; player < 2; ++player) {
-        for (int piece = 0; piece < 12; ++piece) {
-            int pieceIndex = (player * 12)+(piece);
+        for (int piece = 0; piece < PIECES_PER_PLAYER; ++piece) {
+            int pieceIndex = (player * PIECES_PER_PLAYER) + (piece);
             pieceArray[pieceIndex] = new Man(player);
         }
     }
@@ -83,7 +86,6 @@ void GameBoard::newBoard() {
                 Location newPos(x,y);
                 pieceArray[thisPiece] -> updatePosition(newPos);
                 ++thisPiece;
-                Sleep(5);
             }
         }
     }
@@ -110,14 +112,17 @@ void GameBoard::newBoard() {
  * Prints a representation of the game board to console.
  */
 void GameBoard::display() {
+    // Highest row at top
     for (int y = yDimension-1; y >= 0; --y) {
         std::cout << y+1 << " |";
+        // Lowest row on left
         for (int x = 0; x < xDimension; ++x) {
             std::cout << "";
             std::cout << tileArray[x][y]->display();
             std::cout << "|";
         }
         std::cout << std::endl;
+        Sleep(5);
     }
     std::cout << "    A   B   C   D   E   F   G   H" << std::endl;
 }   // end display()
@@ -361,5 +366,25 @@ void GameBoard::kingMe(Location newLoc) {
 
     std::cout << "Your man is now a king!" << std::endl;
 }
+
+
+/**
+ * Checks if game over conditions are met.
+ * (i.e. all of opponents pieces are captured)
+ * @param opponent - int: player identifier for the other player
+ * @return True if game over conditions are met
+ */
+bool GameBoard::isGameOver( int opponent ) {
+    for (int piece = 0; piece < PIECES_PER_PLAYER; ++piece) {
+        int pieceIndex = (opponent * PIECES_PER_PLAYER) + piece;
+
+        if ( pieceArray[pieceIndex]-> inPlay() ) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 #endif //GAMEBOARD_H
