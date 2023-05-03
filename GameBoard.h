@@ -112,9 +112,12 @@ void GameBoard::newBoard() {
  * Prints a representation of the game board to console.
  */
 void GameBoard::display() {
+    system("cls");
+
     // Highest row at top
     for (int y = yDimension-1; y >= 0; --y) {
         std::cout << y+1 << " ";
+
         // Lowest row on left
         for (int x = 0; x < xDimension; ++x) {
             std::cout << tileArray[x][y]->display();
@@ -122,7 +125,14 @@ void GameBoard::display() {
         std::cout << std::endl;
         Sleep(5);
     }
-    std::cout << "   A  B  C  D  E  F  G  H" << std::endl;
+
+    // Display column labels
+    char firstColumnLabel = 'A';
+    std::cout << " ";
+    for (int x = 0; x < xDimension; ++x) {
+        std::cout << "  " << (char)(firstColumnLabel + x);
+    }
+    std::cout << std::endl;
 }   // end display()
 
 
@@ -168,7 +178,6 @@ void GameBoard::playTurn(int player) {
                 std::cout << "Unable to go back to piece selection." << std::endl;
             }
             if ( error == "end" && inAttack ) {         // Wants to end turn after jumping
-                system("cls");
                 display();
                 return;
             }
@@ -207,8 +216,20 @@ Location GameBoard::promptAndValidateLocation(std::string prompt) {
             throw throwString;
         }
 
-        loc.setX( (int)locationInputString[0] - 65 );
+        // Uppercase column
+        if ( locationInputString[0] >= 'A' && locationInputString[0] <= 'Z') {
+            loc.setX( (int)locationInputString[0] - 65 );
+        }
+        // Lowercase column
+        else if ( locationInputString[0] >= 'a' && locationInputString[0] <= 'z')
+            loc.setX( (int)locationInputString[0] - 97 );
+        // Non-letter column (invalid)
+        else
+            loc.setX( -1 );
+        // Row
         loc.setY( (int)locationInputString[1] - 49 );
+
+        std::cout << loc.getX() << ", " << loc.getY() << std::endl;
 
         bool xOnBoard = false;
         bool yOnBoard = false;
@@ -337,6 +358,7 @@ Location GameBoard::getMove(int player, Location loc, bool & inAttack) {
     return newLoc;
 }   // end getMove()
 
+
 /**
  * Moves player's piece to new location.
  * @param prevLoc Location: Start point for player's move
@@ -351,7 +373,6 @@ void GameBoard::movePiece(Location prevLoc, Location newLoc) {
     tileArray[newLoc.getX()][newLoc.getY()] = tileArray[prevLoc.getX()][prevLoc.getY()];
     tileArray[prevLoc.getX()][prevLoc.getY()] = new GameTile();
 
-    system("cls");
     display();
 }
 
@@ -361,12 +382,19 @@ bool GameBoard::isLastRow(Location newLoc) {
 }
 
 
-void GameBoard::kingMe(Location newLoc) {
-    tileArray[newLoc.getX()][newLoc.getY()] -> getPiece() -> kingMe();
-    system("cls");
+/**
+ * Upgrades piece that has made it to the far side of the board.
+ * @param myLoc Location to identify the piece to be upgraded.
+ */
+void GameBoard::kingMe(Location myLoc) {
+    GameTile * thisTile = tileArray[myLoc.getX()][myLoc.getY()];
+    std::string oldName = thisTile-> getPiece()-> getName();
+    thisTile-> getPiece()-> kingMe();
+
     display();
 
-    std::cout << "Your man is now a king!" << std::endl;
+    std::cout << "Your " << oldName<< " is now a "
+              << thisTile-> getPiece()-> getName() <<"!" << std::endl;
 }
 
 

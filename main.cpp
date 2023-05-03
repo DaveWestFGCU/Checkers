@@ -16,7 +16,6 @@ int main() {
     int round { 0 };
     int player, opponent;
 
-    system("cls");
     checkerBoard.display();
 
     // Play game
