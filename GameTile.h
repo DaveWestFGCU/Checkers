@@ -5,8 +5,9 @@
 #include "Man.h"
 #include "King.h"
 
+
 /**
- * A tile on the board. Can hold a Piece object.
+ * A tile on the board. Holds a pointer to the piece on it.
  */
 class GameTile {
 protected:
@@ -18,50 +19,11 @@ public:
     GameTile() = default;
     GameTile(int x, int y);
     void setPiece(Man * gamePiece);
-    Man * getPiece() { return gamePiece; }
+    Man * getPiece();
     bool hasPiece();
     std::string display();
     void removePiece();
 };
 
-
-GameTile::GameTile(int x, int y) {
-    myLocation.setX(x);
-    myLocation.setY(y);
-}
-
-
-void GameTile::setPiece(Man * gamePiece) {
-    this-> gamePiece = gamePiece;
-    tileFilled = true;
-}
-
-
-bool GameTile::hasPiece() {
-    return tileFilled;
-}
-
-
-std::string GameTile::display() {
-    if (tileFilled) {
-        return gamePiece->getSymbol();
-    }
-
-    char whiteSpace = 178;
-    std::string whiteTile(1,whiteSpace);
-    whiteTile += whiteSpace;
-    whiteTile += whiteSpace;
-
-    if ( (myLocation.getX() + myLocation.getY()) % 2 )
-        return whiteTile;
-
-    return "   ";     // empty tile space
-}
-
-
-void GameTile::removePiece() {
-    gamePiece = nullptr;
-    tileFilled = false;
-}
 
 #endif //GAMETILE_H

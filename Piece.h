@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include "Location.h"
-#include "GameTile.h"
 
 /**
  * Class for a game piece object on a 2d board.
@@ -14,23 +13,23 @@ protected:
     int player;
     std::string name;
     std::string symbol;
-    Location myLocation;    // TODO : Change location to pointer to tile's location
+    Location myLocation;    // TODO : Move location out of piece/man/king
     bool alive = true;
 
 public:
     // Constructors
     Piece () = default;
     Piece (int player);
-    ~Piece () { std::cout << "Piece destructor called" << std::endl;   }
+    ~Piece () = default;
 
     // Single line functions
-    std::string getSymbol() { return symbol; }
-    int getPlayer() { return player; }
-    std::string getName() { return name; }
-    void updatePosition(Location newLocation) { myLocation = newLocation; }
-    Location getLocation() { return myLocation; }
-    bool inPlay() { return alive; }
-    void capture() { alive = false; }
+    std::string getSymbol();
+    int getPlayer();
+    std::string getName();
+    void updatePosition(Location newLocation);
+    Location getLocation();
+    bool inPlay();
+    void capture();
 
     // 2+ line functions
     void move(Location newLoc);
@@ -41,27 +40,6 @@ public:
     virtual bool validAttack(Location newLoc) = 0;
 };
 
-
-Piece::Piece (int player) {
-    this -> player = player;
-    this -> symbol = "(" + std::to_string(player) + ")";
-}
-
-
-void Piece::move(Location newLoc) {
-    if ( validMove(newLoc) || validAttack(newLoc)) {
-        myLocation.setX(newLoc.getX());
-        myLocation.setY(newLoc.getY());
-    }
-    else
-        std::cout << "Piece Move function failed!" << std::endl;
-}
-
-
-void Piece::release(Location newLoc) {
-    alive = true;
-    myLocation = newLoc;
-}
 
 
 #endif //PIECE_H
